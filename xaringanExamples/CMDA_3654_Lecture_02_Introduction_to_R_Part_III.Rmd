@@ -1,0 +1,1411 @@
+---
+title: "CMDA 3654: Lecture 02"
+subtitle: "Introduction to R Part III"
+author: "Dr. Christian Lucero ©"
+date: 'Summer II 2019'
+lang: en-US
+output:
+  xaringan::moon_reader:
+    # set to false we can customize our own title slide
+    seal: true 
+    css: xaringan-themer.css
+    lib_dir: libs
+    self_contained: true
+    nature:
+      titleSlideClass: [middle]
+      highlightStyle: xcode
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: '16:9'
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+options(htmltools.dir.version = FALSE, 
+        width = 120)
+
+#knitr::opts_chunk$set(comment = NA, fig.path = "./figures/", fig.align = 'center', tidy.opts = list(width.cutoff=80))
+
+knitr::opts_chunk$set(comment = NA, fig.dim=c(4.8, 4.5), fig.retina=2, out.width="100%",
+                      fig.path = "./figures/", fig.align = 'center', tidy.opts = list(width.cutoff=80)
+                      )
+knitr::opts_hooks$set(fig.callout = function(options) {
+  if (options$fig.callout) {
+    options$echo <- FALSE
+    options$out.height <- "99%"
+    options$fig.width <- 16
+    options$fig.height <- 8
+  }
+  options
+})
+
+# Set to the working directory
+setwd("~/Dropbox/teaching/SU19/CMDA_3654/lectures/Lecture_02_Introduction_to_R_Part_III/")
+```
+
+
+```{r xaringan-themer, include=FALSE}
+library(xaringanthemer)
+mono_light(
+  # code_font_family = "Fira Code",
+  # code_font_url    = "https://cdn.rawgit.com/tonsky/FiraCode/1.204/distr/fira_code.css"
+  base_color = "#002451",
+  white_color = lighten_color("#002451", 0.95),
+  code_inline_background_color = "white",
+  code_inline_color = "#7600a8",
+  header_font_family = "Roboto Condensed",
+  header_font_weight = "300",
+  code_font_google   = google_font("Inconsolata"),
+  title_slide_background_image = "../../libs/my_css/VT_Logo_White.png",
+  title_slide_background_size = "350px",
+  title_slide_background_position = "100% 90%",
+  text_font_size = "18px",
+  header_h1_font_size = "40px",
+  header_h2_font_size = "32px",
+  header_h3_font_size = "26px",
+  # header_h1_font_size = "45px",
+  # header_h2_font_size = "35px",
+  # header_h3_font_size = "28px",
+  code_highlight_color = "ffff00",   #"#FFD3DE",    #"#A3FF00"
+  link_color = "#FF6600"
+
+)
+```
+
+
+```{css, echo=FALSE}
+/* Custom css for_slide margins */
+.remark-slide-content {
+  padding-top: 10px;
+  padding-left: 25px;
+  padding-right: 25px;
+  /* padding-bottom: 400px; */
+}
+
+.remark-slide-content > h1:first-of-type {
+  margin-top: 0px;
+}
+
+# .title-slide {
+#   background-image: url("./libs/my_css/title_slide.svg");
+#   /* background-position: 8% 10%; */
+#   /* background-size: 500px; */
+#   /* background-color: #fff; */
+#   /* padding-left: 100px;  /* delete this for 4:3 aspect ratio */ */
+# }
+
+
+/* H1 fonts */
+.title-slide h1 {
+  #color: #8B1F41;
+  color: #FFFFFF;
+  padding-top: 0px;
+  padding: 110px;
+  font-weight: normal;
+  font-size: 45px;
+  text-align: left;
+  text-shadow: none;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+
+/* H2 fonts */
+.title-slide h2 {
+  #color: #FFca57;
+  #color: #f1d700;
+  color: #00ffff;
+  #color: #FF6600;
+  #color: #FFFFFF;
+  padding: 110px;
+  font-size: 35px;
+  text-align: left;
+  text-shadow: none;
+  padding-top: 0px;
+  margin-top: 0px;
+  padding-bottom: 10px;
+}
+
+/* H3 fonts */
+.title-slide h3 {
+  font-size: 24px; #28px;
+  font-weight: normal;
+  #color: #75787B;
+  color: #fde3a7;
+  #color: #c7c9ca;
+  #color: #F7F7F7;
+  text-align: left;
+  text-shadow: none;
+  padding: 110px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  line-height: 1.25;
+}
+
+/* Custom Colors */
+.VTmaroon {
+  color: #8B1F41;
+}
+
+.VTorange {
+  color: #FF6600;
+}
+
+.maroon {
+  color: #800000
+}
+
+
+
+/* Font size tags */
+.big {
+  font-size: 1.5em;
+}
+.huge {
+  font-size: 175%;
+}
+.tiny {
+  font-size: 75%;
+}
+.myscriptsize {
+  font-size: 89%;
+}
+
+.VTorangebold {
+  font-weight: bold;
+  color: #FF6600;
+}
+
+
+# h1 {
+#   padding-top: 0px;
+#   padding-right: 0px;
+#   padding-bottom: 0px;
+#   padding-left: 0px;
+# }
+
+/* Changes colors of headers */
+h2 {
+  color: #FF6600;
+  # padding-top: 0px;
+  # padding-right: 0px;
+  # padding-bottom: 0px;
+  # padding-left: 0px;
+}
+
+h3 {
+  color: #000036;
+}
+
+h4 {
+  color: #000000;
+}
+
+
+
+/* Column Layouts */
+
+/* Two-column layout (slightly wider for aspect ratio) */
+.left-column {
+  color: #000;
+  width: 25%;
+  float: left;
+  padding-top: 1em;
+}
+
+.left-column h2:last-of-type, .left-column h3:last-child {
+   color: #000;
+}
+
+/* slightly thiner to support aspect ratio */
+.right-column {
+  width: 70%;
+  float: right;
+  /* padding-top: 1em;*/
+}
+
+/* vt blockquote */
+/* How to use: <vt-blockquote>text</vt-blockquote> */  
+  
+vt-blockquote {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  margin-left: 40px;
+  margin-right: 40px;
+  border-left: solid 10px #FF6600;
+  background-color: #002451;
+  padding: 1em;
+  color: #fff;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+
+
+/* unvisited link */
+a:link {
+  text-decoration: underline;
+}
+
+/* mouse over link */
+a:hover {
+  color: #7600a8; 
+}
+
+
+
+
+/* Column Spacing */
+.pull-left {
+  float: left;
+  width: 48%;
+}
+
+.pull-right {
+  float: right;
+  width: 48%;
+}
+
+.pull-right ~ * {
+  clear: both;
+}
+
+
+
+
+
+/* custom.css by someone */
+  
+/* Left-side is 38% width */
+.left-code {
+  color: 777;
+  width: 38%;
+  height: 92%;
+  float: left;
+}
+
+/* Ridge-side is 60% width */
+.right-plot {
+  width: 60%;
+  float: right;
+  padding-left: 1%;
+}
+.plot-callout {
+  height: 225px;
+  width: 450px;
+  bottom: 5%;
+  right: 5%;
+  position: absolute;
+  padding: 0px;
+  z-index: 100;
+}
+.plot-callout img {
+  width: 100%;
+  border: 4px solid #23373B;
+}
+
+
+/* Ben Custom css */
+  
+
+
+
+```
+
+
+# Basic Numerical and Visual Summaries in R
+
+
+.pull-left[
+
+
+.huge[
+.maroon[
+<div align = "right"> The greatest value of a picture is when it forces us to notice what we never expected to see.
+
+-- John Tukey
+</div>
+]
+]
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="30%", fig.cap="John Tukey", fig.align='left'}
+include_graphics("figures/John_Tukey.jpg")
+```
+
+
+]
+
+
+In this part of the lecture we will learn about the following topics:
+
+1. How to carry out basic numerical summaries on variables within data frames.
+
+2. How to obtain numerical summaries on subsets of data frames (while practicing more subsetting).
+
+3. Additional information about library packages and how they provide additional functions that we can use.
+
+4. How to generate some commonly used plots in R.
+
+&nbsp;
+
+There is a practicum section where you will practice everything you learned in all three portions of Lecture 02.
+
+
+
+
+
+---
+
+# Basic Numerical Summaries
+
+
+
+.VTorangebold[Make sure that the blood brain dataset is loaded into R before proceeding.]
+
+```{r}
+# We learned how to read in data from a .csv file in the previous portion of the lecture. Do the following.
+brain <- read.csv(file = "data/bloodbrain.csv", header = T)
+```
+
+Most of the basic numerical summaries have obvious names.  If we want to get the mean, sd (standard deviation), and more for variables we can use the same basic pattern.
+
+```{r, R.options=list(width=150)}
+
+
+# The mean of the Liver variable observations from the brain data.frame
+mean( brain$Liver )
+
+# The standard deviation of the Liver variable observations from the brain data.frame
+sd( brain$Liver )
+
+# There are short-cut functions that do a lot of the basic work for us too such as summary() which provides 5-number summaries 
+#  (plus the mean) for numerical observations and frequency tables for categorical observations.
+summary(brain)
+
+```
+
+
+---
+
+Don't forget that not all variables are numerical, we have different types of summaries for categorical data.
+
+
+```{r}
+# We see that the Sex observation is a categorical variable.
+brain$Sex
+
+# We can make a table of counts (aka, absolute frequencies) with a number of functions, the easiest is table()
+table(brain$Sex)
+
+# We can make a relative frequency table a number of ways too.
+table(brain$Sex)/length(brain$Sex)
+
+# Or equivalently
+prop.table( table(brain$Sex) )
+
+```
+
+
+
+---
+
+
+
+# Practice Using Numerical Summaries and Logical Subsetting
+
+Try out the following for yourself and read the comments for explanations.
+
+```{r}
+# How can I get the mean of the tumors when the treatment is BD?
+
+# Think about this in steps.
+
+# First, I want just want the Treatments that correspond to the BD treatment
+brain$Treatment == "BD"
+
+# If I use the above logical statement as an index, then I can can get the Tumor measurements for 
+#  rats who were given the BD treatment
+# Note we don't have to use which() every time, the TRUEs are the only locations used.
+brain$Tumor[ brain$Treatment == "BD" ]
+
+# Now we can take the mean of the Tumor measurements for rats who were given the BD treatment.
+mean( brain$Tumor[ brain$Treatment == "BD" ] )  
+
+# The last line gives the answer we want and you'll eventually memorize the pattern
+
+```
+
+
+
+
+---
+
+# Advanced, But Very Useful: The apply() Family in R
+
+* There are other useful functions either in Base R or in library packages that we can use that might be more efficient.
+
+* The `apply()` family is used for quick aggregation and numerical summaries.  Let's just focus on the `tapply()` function for now. You can read more these functions here: [r-apply-functions: https://www.guru99.com/r-apply-sapply-tapply.html](https://www.guru99.com/r-apply-sapply-tapply.html)
+
+Usage:  `tapply( numerical_variable,  categorical_variable,  function_name )`
+
+```{r}
+
+# Find the means of the Tumor measurements broken down by the different Treatments
+tapply( brain$Tumor, brain$Treatment, mean)
+
+# Find the standard deviations of the Tumor measurements broken down by the different Treatments
+tapply( brain$Tumor, brain$Treatment, sd)
+
+# Find the five-number summary for the Tumor measurements broken down by the different Treatments
+tapply( brain$Tumor, brain$Treatment, quantile)
+
+```
+
+
+
+---
+
+class: inverse, middle, center
+
+# More about Library Packages
+
+---
+
+class: middle
+
+* There are many more statistical methods than what you learned about in your first couple of Statistics courses.
+
+* Many of these methods are built into Base R, however there are many library packages that contain additional functions and datasets that we can download and make use of.
+
+* Often times, the new functions are written to do specific tasks in either different and/or more efficient ways.
+
+.VTorangebold[Let's practice.]
+
+Our goal is to install `psych` library package.
+
+* I will demonstrate how to use some point-and-click method to do this for you in a short video clip.
+
+  - This generally involves you going to the Packages tab in the bottom right quadrant and clicking "Install" and it will open a dialog box where you can type the name of the package you wish to install.
+
+  - In general, I advise you to use the point-and-click method for installation of packages, especially if it's your first time installing a package.  Go ahead and accept the defaults if it asks you questions.
+
+* Alternatively, we can install packages using a function like the one you see below but you never really need to.
+
+The following is a way to install the `psych` library using the Console command line.  You only need to do this once.
+
+```{r eval=FALSE}
+install.packages("psych")
+```
+
+* Once installed, to enable a library package you can use the point-and-click method or type the Console command line.
+
+```{r eval=FALSE}
+library("psych")
+```
+
+
+
+---
+
+Make sure that you have installed and enabled the `psych` library. 
+
+The point-and-click method requires clicking the Packages Tab and checking the selection box next to `psych`.
+
+```{r R.options=list(width=150)}
+# The command line in this case is generally preferred though.
+# You generally only need to do this once after R has been opened.
+library(psych)   # require() also works but I advise using it for reasons I won't get into.
+```
+
+
+We can learn about a library package by looking at the help.  This generally lists some information about who wrote the library, and what functions and datasets are contained within.
+
+```{r eval=FALSE}
+? psych
+```
+
+The `describe()` function is a function that we obtained by downloading and enabling the `psych` library.
+
+```{r R.options=list(width=150)}
+# Provides a lot of different times of numerical summaries
+describe(brain)  
+```
+
+We will download other libraries throughout the course.
+
+
+---
+
+# Numerical Summaries on Subsets of Data Frames 
+
+```{r eval=FALSE}
+# Recall the full brain data set, you can look at it on your own.
+View(brain)  # or just type print(brain)
+```
+
+.pull-left[
+
+```{r}
+# Return only the observations where the treatment was BD
+# We can save this into a new data frame if we wish
+brain_BD_only <- subset(brain, Treatment == "BD")
+brain_BD_only
+```
+]
+
+
+.pull-right[
+
+```{r}
+# Return only the observations where the treatment was NS
+# We can save this into a new data frame if we wish
+brain_NS_only <- subset(brain, Treatment == "NS")
+brain_NS_only
+```
+]
+
+---
+
+.pull-left[
+
+* We can use logical operators to subset our data frames into very specific cases.
+
+```{r}
+# Subset the BD treatments AND just the Females
+subset(brain, Treatment == "BD" & Sex == "Female")
+# Subset the BD treatments AND just the Males
+subset(brain, Treatment == "BD" & Sex == "Male")
+
+```
+
+]
+
+.pull-right[
+
+```{r}
+# This returns only the Tumor variable when the treatment is BD
+# we can save this into a new data frame if we wish
+tumor_weight_BD_df <- subset(brain, 
+                             Treatment == "BD", 
+                             select = "Tumor")
+tumor_weight_BD_df
+
+# Let's do the same thing but only get the NS treatments
+# This returns only the Tumor variable when the treatment is NS
+# we can save this into a new data frame if we wish
+tumor_weight_NS_df <- subset(brain, 
+                             Treatment == "NS", 
+                             select = "Tumor")
+
+
+```
+
+]
+
+
+---
+
+
+.pull-left[
+
+* Sometimes we don't want to return an entire data frame, and instead just the observations for various situations.
+
+```{r R.options=list(width=70)}
+# Returns tumor weights from the brain dataset 
+#  where the treatment is BD.
+brain$Tumor[ brain$Treatment == "BD" ]
+
+# Returns tumor weights from the brain dataset 
+#  where the treatment is NS.
+brain$Tumor[ brain$Treatment == "NS" ]
+
+
+# The mean tumor weights for all rats on the BD Treatment
+tumor_mean_BD <- mean( brain$Tumor[ brain$Treatment == "BD" ] )
+tumor_mean_BD
+
+# The mean tumor weights for all rats on the NS Treatment
+tumor_mean_NS <- mean( brain$Tumor[ brain$Treatment == "NS" ] )
+tumor_mean_NS
+
+
+```
+
+]
+
+
+.pull-right[
+
+```{r R.options=list(width=70)}
+
+# The mean tumor weights for Female rats on the BD Treatment
+tumor_mean_BD_F <- mean( brain$Tumor[ brain$Treatment == "BD" & 
+                                        brain$Sex == "Female" ] )
+tumor_mean_BD_F
+
+# The mean tumor weights for Female rats on the NS Treatment
+tumor_mean_NS_F <- mean( brain$Tumor[ brain$Treatment == "NS" & 
+                                        brain$Sex == "Female" ] )
+tumor_mean_NS_F
+
+```
+
+
+&nbsp;
+
+* By now you should see that I am carefully storing my answer in what I think are very good object names.
+
+]
+
+
+---
+
+
+```{r}
+# On the previous slide, we saw the & can be used as an intersection condition, that is, 
+#  we want condition 1 & condition 2 to be satisfied.
+# Hence, TRUE is both conditions are satisfied, FALSE otherwise.
+brain$Treatment == "BD" & brain$Sex == "Female"
+
+# We also use a union condition, i.e. we want either condition 1 or condition 2 (or both) to be satisfied. 
+#  The notation for "or" is the | symbol.
+# Hence TRUE if Treatment is BD or Sex is Female or both are true.  
+#  Otherwise, FALSE (Males with NS treatment)
+brain$Treatment == "BD" | brain$Sex == "Female"
+
+
+# Consider the Time Variable
+brain$Time
+brain$Time <= 0.5 # Times less than or equal to 0.5
+
+brain$Time > 24 # Times greater than 24
+```
+
+
+---
+
+```{r}
+# Both conditions can't be satisfied simultaneously
+brain$Time <= 0.5 & brain$Time > 24
+
+# Condition 1 OR Condition 2 can be true
+brain$Time <= 0.5 | brain$Time > 24
+
+```
+
+
+&nbsp;
+
+
+* It takes practice to use logical statements effectively, but it is an absolute requirement for when you want to subset data efficiently.
+
+
+---
+
+
+class: inverse, middle, center
+
+
+# Some* Basic Plots Using Base R
+
+.big[*There are simply too many out there, but here are some common ones]
+
+---
+
+# Scatterplots
+
+.pull-left[
+
+Let's review plotting with a few examples that highlight some basic techniques that you studied in a Statistics course.
+
+* We already saw a couple of basic examples of scatter plots.
+
+```{r eval=FALSE}
+# Usage: plot( x_variable, y_variable).  
+#    OR: plot( y_variable ~ x_variable ) 
+# Note: the ~ key is next to the 1 key on US keyboards.
+# The x variable is called the predictor/explanatory variable, 
+# The y_variable is called the response variable.
+
+plot( x = USArrests$Assault, y = USArrests$Murder, pch = 19)
+
+# It's understood that x is first, then y
+plot( USArrests$Assault, USArrests$Murder, pch = 19)
+
+# Alternatively we can do 
+plot( USArrests$Murder ~ USArrests$Assault, pch = 19)
+# (think y versus x with this technique)
+
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Scatterplot 1"}
+plot( USArrests$Assault, USArrests$Murder, pch=19)
+```
+
+]
+
+---
+
+&nbsp;
+
+.pull-left[
+
+Let's make the plot more fancy by adding labels and a title  
+
+* See the R Tutorial for more examples
+
+```{r eval=FALSE}
+plot(USArrests$Assault, USArrests$Murder,
+     pch = 19,
+     xlab = "Assault Arrests (per 100,000)",
+     ylab = "Murder Arrests (per 100,000)",
+     main = "Murder Arrests versus Assault Arrests" )
+
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Scatterplot 2"}
+
+plot(USArrests$Assault, USArrests$Murder,
+pch = 19,
+xlab = "Assault Arrests (per 100,000)",
+ylab = "Murder Arrests (per 100,000)",
+main = "Murder Arrests versus Assault Arrests" )
+
+
+```
+
+
+]
+
+
+
+---
+
+&nbsp;
+
+.pull-left[
+
+* We can use our logical statements and store indices for special situations.
+
+
+```{r, R.options=list(width = 70)}
+
+# Which of the points above occur in states that have an 
+#  urban population greater than 80%?
+pop_greater_80_index <- which(USArrests$UrbanPop > 80)
+pop_greater_80_index
+
+# What states have an urban population greater than 80%?
+row.names(USArrests)[ pop_greater_80_index ]
+
+```
+
+
+```{r eval=FALSE}
+# Now let's plot the Assaults and Murders in states
+#  where the urban population is greater than 80%
+plot(x = USArrests$Assault[pop_greater_80_index], 
+y = USArrests$Murder[pop_greater_80_index], 
+pch = 17, 
+col = "red", 
+cex = 2) # Makes the plot character 200% bigger
+
+```
+
+]
+
+
+.pull-right[
+
+
+```{r echo=FALSE, out.width="100%", fig.cap="Scatterplot 3"}
+
+plot( x = USArrests$Assault[pop_greater_80_index], 
+y = USArrests$Murder[pop_greater_80_index], 
+pch = 17, col = "red", cex = 2)
+
+```
+
+]
+
+
+
+
+
+---
+
+&nbsp;
+
+.pull-left[
+
+* If we have an existing plot, we can add additional points to it afterwards.
+
+  - We can also add text, lines, and other plotting images too but you'll learn this over time.
+
+```{r eval=FALSE}
+
+# First plot all of the points
+plot(USArrests$Assault, USArrests$Murder,
+     pch = 19,
+     xlab = "Assault Arrests (per 100,000)",
+     ylab = "Murder Arrests (per 100,000)",
+     main = "Murder Arrests versus Assault Arrests" )
+
+
+# Then add additional points to the plot
+points(x = USArrests$Assault[pop_greater_80_index], 
+       y = USArrests$Murder[pop_greater_80_index], 
+       pch = 17, 
+       col = "red", 
+       cex = 2)
+
+```
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Scatterplot 4"}
+
+plot(USArrests$Assault, USArrests$Murder,
+     pch = 19,
+     xlab = "Assault Arrests (per 100,000)",
+     ylab = "Murder Arrests (per 100,000)",
+     main = "Murder Arrests versus Assault Arrests" )
+
+points( USArrests$Assault[pop_greater_80_index], 
+        USArrests$Murder[pop_greater_80_index], pch=17, col="red", cex=2)
+
+
+
+```
+
+
+]
+
+
+
+
+---
+
+* Let's add some text in addition to the triangles
+
+.pull-left[
+```{r eval=FALSE}
+
+# First plot all of the points
+plot(USArrests$Assault, USArrests$Murder,
+pch = 19,
+xlab = "Assault Arrests (per 100,000)",
+ylab = "Murder Arrests (per 100,000)",
+main = "Murder Arrests versus Assault Arrests" )
+
+
+# Then add additional points to the plot
+points(x = USArrests$Assault[pop_greater_80_index], 
+y = USArrests$Murder[pop_greater_80_index], 
+pch = 17, 
+col = "red", 
+cex = 2)
+
+# We can add labels
+text( USArrests$Assault[pop_greater_80_index],  
+USArrests$Murder[pop_greater_80_index], 
+row.names(USArrests)[ pop_greater_80_index ])
+
+
+```
+
+&nbsp;
+
+.maroon[Conclusion:]  Having a high Urban population does not necessarily mean that you will have high numbers of Murders and Assaults as Hawaii, Massachusetts, and Rhode Island are clear exceptions.
+
+Let's make this plot bigger and use the whole next slide for a better look.
+
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Scatterplot 5"}
+
+# First plot all of the points
+plot(USArrests$Assault, USArrests$Murder,
+pch = 19,
+xlab = "Assault Arrests (per 100,000)",
+ylab = "Murder Arrests (per 100,000)",
+main = "Murder Arrests versus Assault Arrests" )
+
+
+# Then add additional points to the plot
+points(x = USArrests$Assault[pop_greater_80_index], 
+y = USArrests$Murder[pop_greater_80_index], 
+pch = 17, 
+col = "red", 
+cex = 2)
+
+# We can add labels
+text( USArrests$Assault[pop_greater_80_index],  
+USArrests$Murder[pop_greater_80_index], 
+row.names(USArrests)[ pop_greater_80_index ])
+
+```
+
+
+]
+
+
+
+---
+
+
+```{r, echo=FALSE, fig.cap="Scatterplot 5 but Bigger", out.width="100%"}
+include_graphics("./figures/scatterplot_5_bigger.png")
+```
+
+
+
+
+---
+
+
+
+
+# Histograms
+
+.pull-left[
+
+&nbsp;
+
+Histograms are a very important data visualization tool.
+
+* The default histogram uses absolute frequencies.
+
+* R decides automatically how many bins (and bin size) to use.
+- All bins are the same width by default.
+
+```{r eval=FALSE}
+hist(brain$Tumor)
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Histogram 1"}
+hist(brain$Tumor)
+```
+
+]
+
+---
+
+&nbsp;
+
+.pull-left[
+
+* We can make a relative frequency histogram in R with a simple option.
+
+* Note that in reality R is making density histograms and not typical relative frequency histograms.
+
+- The difference is that the bar widths have meaning so that the probability is not given by the height, it's given by the area.
+
+```{r eval=FALSE}
+hist(brain$Tumor, probability = T)
+```
+
+
+.maroon[Suggested Reading:] Learning how to manipulate the axes and tick locations.
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Histogram 2"}
+hist(brain$Tumor, probability = T)
+```
+
+]
+
+
+
+---
+
+&nbsp;
+
+.pull-left[
+
+```{r eval=FALSE}
+hist(brain$Tumor, 
+     probability = T, 
+     ylim = c(0, 0.007), # This zooms out in the y-direction
+     xlab = "Tumor",
+     ylab = "relative frequency", 
+     col = "red")
+
+```
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Histogram 3"}
+hist(brain$Tumor, 
+     probability = T, 
+     ylim = c(0, 0.007),
+     xlab = "Tumor", 
+     ylab = "relative frequency", 
+     col = "red")
+
+```
+
+]
+
+
+---
+
+&nbsp;
+
+.pull-left[
+
+```{r eval=FALSE}
+# We can control the number of bins using different methods, 
+#  but the easiest is to just ask for the number of breaks.
+#  R will do it's best to give us that many breaks.
+hist(brain$Tumor, 
+     probability = T, 
+     xlim = c(0, 500) , 
+     ylim = c(0, 0.010),
+     xlab = "Tumor", 
+     ylab = "relative frequency", 
+     main = "Tumor Weights",
+     breaks = 20, # We want 20 breaks, which means more bins
+     col = "yellow")
+
+```
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Histogram 4"}
+# We can control the number of bins using different methods, but the easiest is to
+#  just ask for the number of breaks.  R will do it's best.
+hist(brain$Tumor, probability = T, xlim = c(0, 500) , ylim = c(0, 0.010),
+xlab = "Tumor", ylab = "relative frequency", main = "Tumor Weights",
+breaks = 20, col="yellow")
+
+```
+
+
+]
+
+
+
+---
+
+# Boxplots
+
+.pull-left[
+
+```{r eval=FALSE}
+# For a single boxplot, simply do the following:
+boxplot( brain$Tumor )
+
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Boxplot 1"}
+
+boxplot( brain$Tumor )
+
+```
+
+]
+
+
+---
+
+&nbsp;
+
+.pull-left[
+
+```{r eval=FALSE}
+
+# We can change the orientation of the boxplots easily enough
+
+boxplot( brain$Tumor, 
+         horizontal = T)
+
+```
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Boxplot 2"}
+
+boxplot( brain$Tumor, 
+         horizontal = T)
+
+```
+
+]
+
+---
+
+&nbsp;
+
+.pull-left[
+
+* We suspect that Tumor weight might be different between male and female rats.
+  
+  - We should use side-by-side boxplots to visualize this
+
+The notation we use is one we'll see often through this course.
+Usage: `boxplot( response_variable ~ explanatory_variable)`
+
+
+```{r eval=FALSE}
+boxplot(brain$Tumor ~ brain$Sex,
+        xlab = "Sex", 
+        ylab = "Tumor Weight", 
+        main = "Tumor Weight by Rat Sex")
+
+```
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Boxplot 3"}
+
+boxplot(brain$Tumor ~ brain$Sex,
+        xlab = "Sex", 
+        ylab = "Tumor Weight", 
+        main = "Tumor Weight by Rat Sex")
+
+
+```
+
+]
+
+
+---
+
+&nbsp;
+  
+.pull-left[
+
+```{r eval=FALSE}
+# We can also look at Tumor differences 
+#  between the different treatments.
+boxplot(brain$Tumor ~ brain$Treatment,
+        xlab = "Drug Treatment",
+        lab = "Tumor Weight",
+        main = "Tumor Weight by Treatment")
+
+```
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Boxplot 4"}
+boxplot(brain$Tumor ~ brain$Treatment, 
+        xlab = "Drug Treatment", ylab = "Tumor Weight", main="Tumor Weight by Treatment")
+
+```
+
+
+]
+
+
+
+
+
+---
+
+
+
+# Barplots
+
+.pull-left[
+
+You probably remember barplots well. 
+
+* Some things to keep in mind.  Unlike histograms, for barplots...
+
+- The widths of the bars are meaningless
+
+- The distance between the bars are also meaningless.
+
+```{r eval=FALSE}
+
+barplot( table( brain$Sex ) ,
+         ylim = c(0, 30),
+         col = c("pink" , "blue"), 
+         main = "Number of Rats of each Sex in the Study" )
+
+```
+
+* In this case, we have 2 categories, so we specified a different color for each.
+
+]
+
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Barplot 1"}
+
+barplot( table( brain$Sex ) ,
+ylim = c(0, 30),
+col = c("pink" , "blue"), 
+main = "Number of Rats of each Sex in the Study" )
+
+
+```
+
+
+
+]
+
+---
+
+&nbsp;
+
+.pull-left[
+
+* For relative frequencies we just need to do a little more work, again there are many other ways to do this.
+
+```{r eval=FALSE}
+barplot( table( brain$Sex ) / sum(table(brain$Sex)) , 
+ylim = c(0, 0.8),
+col = c("pink","blue"), 
+main = "Proportion of Rats of each Sex in the Study")
+
+```
+
+Feel free to look at the R Tutorial for more examples.
+
+]
+
+.pull-right[
+
+```{r echo=FALSE, out.width="100%", fig.cap="Barplot 2"}
+
+barplot( table( brain$Sex ) / sum(table(brain$Sex)) , 
+ylim = c(0, 0.8),
+col = c("pink","blue"), 
+main = "Proportion of Rats of each Sex in the Study")
+
+
+```
+
+]
+
+
+
+---
+
+
+
+class: inverse, middle, center
+
+# Practicum
+
+---
+
+
+InsectSprays is a built-in dataset that compares the efficacy of different types of insect sprays.
+
+```{r}
+data(InsectSprays)
+```
+
+.VTorangebold[Answer the following questions using functions your learned in this lecture and interpret if neccessary by typing a comment.]
+
+
+1. What is the structure of this data set?
+
+2. Use the help to describe what the variables represent.
+
+3. Find the mean count regardless of the the spray type
+
+4. Find the 5 number summary for the count regardless of the spray type.
+  - Additionally, find the 58th percentile of the count variable using the `quantile()` function. Use `? quantile` if lost.
+
+5. Generate a relative frequency histogram with 10 breaks for the count variable. Label aspects appropriately. Feel free to customize it further if you like.
+
+6. Make a boxplot for all of the count data, are there any outliers?
+
+7. Make side-by-side boxplots where count is the response variable and spray type is the explanatory variable.  Use a different color for each boxplot.
+
+8. Use the `tapply()` function to find the mean and the standard of the counts for the different types of Sprays.
+  - Compare this with just using the `mean()` and `sd()` one at a time for each spray type.
+
+9. Use the `subset()` function to return a data frame that consists of only the "C" spray.
+
+10. Use indexing along with logical operators to find the mean count when the "D" spray was used.
+
+---
+
+
+**11.** Suppose sprays A and B are actually the same spray.  Ooops!  How can we combine their observations to get the correct mean?
+
+There are many ways that this can be done.  The easiest is to notice that all of the observations are grouped. All the A's occur first in the data set, then the B's, etc.  
+
+In practice the observations are usually scrambled (order in which they were collected).  So we should use logical operators to find all of the observations from sprays A and B.
+
+Let's scramble the data so that we are forced to search properly and then obtain our final goal.
+
+
+```{r eval=FALSE}
+# To help you practice this honestly, let's scramble the dataset
+set.seed(0)
+q <- sample(1:72)
+myinsectsprays <- InsectSprays[q, ]
+View(myinsectsprays)  # We can see that the rows are scrampbled by looking at the dataframe again.
+```
+
+```{r eval=FALSE}
+# Now obtain the mean of the count for the combined observations from sprays A and B.
+# This is a bit longer than necessary, but might help you if you get stuck.
+myindex <- c(which(myinsectsprays$spray == "A"), which(myinsectsprays$spray == "B"))
+
+# Now we can take the mean doing the following:
+mean( myinsectsprays$count[ myindex ] )
+
+# A more efficient way is to do the following:
+mean( myinsectsprays$count[ myinsectsprays$spray == "A" | myinsectsprays$spray == "B" ]   )
+
+```
+
+Study the above and try to understand what's going on.
